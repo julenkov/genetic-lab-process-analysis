@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_ToBe" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.31.1">
+  <bpmn:collaboration id="Collaboration_ToBe">
+    <bpmn:participant id="Participant_Lab" name="Лаборатория (TO-BE)" processRef="Process_ToBe" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_ToBe" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Reg" name="Регистратор">
+        <bpmn:flowNodeRef>Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Receive</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Register</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Release</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_OK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Recollect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Recollected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ReceiveAgain</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Close</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Closed</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Lab" name="Лаборатория">
+        <bpmn:flowNodeRef>MG_Sample</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_QCSample</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_SampleOK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Extract</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>MG_DNA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_QCDNA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_DNAOK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Library</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_QCLib</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_LibOK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>MG_Enq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Enqueue</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Reject</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RedoDNA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RedoLib</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Eq" name="Оборудование">
+        <bpmn:flowNodeRef>Timer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Seq</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Bio" name="Биоинформатик">
+        <bpmn:flowNodeRef>T_QCRun</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_RunOK</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Bio</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Gen" name="Врач-генетик">
+        <bpmn:flowNodeRef>T_Interpret</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Report</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Rework</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Sen" name="Старший врач-генетик">
+        <bpmn:flowNodeRef>MG_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Approved</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start" name="Образец поступил">
+      <bpmn:outgoing>F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="T_Receive" name="Получить образец">
+      <bpmn:incoming>F01</bpmn:incoming>
+      <bpmn:outgoing>F02</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Register" name="Зарегистрировать образец">
+      <bpmn:incoming>F02</bpmn:incoming>
+      <bpmn:outgoing>F03</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="MG_Sample">
+      <bpmn:incoming>F03</bpmn:incoming>
+      <bpmn:incoming>F31</bpmn:incoming>
+      <bpmn:outgoing>F04</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_QCSample" name="Проверить качество образца">
+      <bpmn:incoming>F04</bpmn:incoming>
+      <bpmn:outgoing>F05</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_SampleOK" name="Образец годен?">
+      <bpmn:incoming>F05</bpmn:incoming>
+      <bpmn:outgoing>F06</bpmn:outgoing>
+      <bpmn:outgoing>F27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Extract" name="Выделить ДНК">
+      <bpmn:incoming>F06</bpmn:incoming>
+      <bpmn:outgoing>F07</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="MG_DNA">
+      <bpmn:incoming>F07</bpmn:incoming>
+      <bpmn:incoming>F35</bpmn:incoming>
+      <bpmn:outgoing>F08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_QCDNA" name="Проверить качество ДНК">
+      <bpmn:incoming>F08</bpmn:incoming>
+      <bpmn:outgoing>F09</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_DNAOK" name="ДНК годна?">
+      <bpmn:incoming>F09</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:outgoing>F34</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Library" name="Подготовить библиотеку">
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_QCLib" name="Проверить качество библиотеки">
+      <bpmn:incoming>F11</bpmn:incoming>
+      <bpmn:incoming>Flow_0chtr5s</bpmn:incoming>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_LibOK" name="Библиотека годна к секвенированию?">
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+      <bpmn:outgoing>F36</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="MG_Enq">
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:incoming>F38</bpmn:incoming>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Enqueue" name="Поставить в партию секвенирования">
+      <bpmn:incoming>F14</bpmn:incoming>
+      <bpmn:outgoing>F15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Timer" name="Ждать старта партии (пн/ср/пт 09:00)">
+      <bpmn:incoming>F15</bpmn:incoming>
+      <bpmn:outgoing>F16</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerDef_1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="T_Seq" name="Секвенировать образец">
+      <bpmn:incoming>F16</bpmn:incoming>
+      <bpmn:outgoing>F17</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_QCRun" name="Проверить качество данных секвенирования">
+      <bpmn:incoming>F17</bpmn:incoming>
+      <bpmn:outgoing>F18</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_RunOK" name="Данные годны?">
+      <bpmn:incoming>F18</bpmn:incoming>
+      <bpmn:outgoing>F19</bpmn:outgoing>
+      <bpmn:outgoing>F38</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Bio" name="Выполнить биоинформатический анализ">
+      <bpmn:incoming>F19</bpmn:incoming>
+      <bpmn:outgoing>F20</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Interpret" name="Интерпретировать варианты">
+      <bpmn:incoming>F20</bpmn:incoming>
+      <bpmn:outgoing>F21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Report" name="Подготовить заключение">
+      <bpmn:incoming>F21</bpmn:incoming>
+      <bpmn:outgoing>F22</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="MG_Review">
+      <bpmn:incoming>F22</bpmn:incoming>
+      <bpmn:incoming>F40</bpmn:incoming>
+      <bpmn:outgoing>F23</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Review" name="Проверить заключение">
+      <bpmn:incoming>F23</bpmn:incoming>
+      <bpmn:outgoing>F24</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_Approved" name="Заключение утверждено?">
+      <bpmn:incoming>F24</bpmn:incoming>
+      <bpmn:outgoing>F25</bpmn:outgoing>
+      <bpmn:outgoing>F39</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_Release" name="Выдать результат">
+      <bpmn:incoming>F25</bpmn:incoming>
+      <bpmn:outgoing>F26</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_OK" name="Результат выдан">
+      <bpmn:incoming>F26</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="T_Reject" name="Отклонить образец">
+      <bpmn:incoming>F27</bpmn:incoming>
+      <bpmn:outgoing>F28</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Recollect" name="Запросить повторный забор">
+      <bpmn:incoming>F28</bpmn:incoming>
+      <bpmn:outgoing>F29</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_Recollected" name="Образец предоставлен повторно?">
+      <bpmn:incoming>F29</bpmn:incoming>
+      <bpmn:outgoing>F30</bpmn:outgoing>
+      <bpmn:outgoing>F32</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_ReceiveAgain" name="Получить повторный образец">
+      <bpmn:incoming>F30</bpmn:incoming>
+      <bpmn:outgoing>F31</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Close" name="Закрыть случай: образец не предоставлен">
+      <bpmn:incoming>F32</bpmn:incoming>
+      <bpmn:outgoing>F33</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_Closed" name="Случай закрыт">
+      <bpmn:incoming>F33</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="T_RedoDNA" name="Повторить выделение ДНК">
+      <bpmn:incoming>F34</bpmn:incoming>
+      <bpmn:outgoing>F35</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_RedoLib" name="Повторить подготовку библиотеки">
+      <bpmn:incoming>F36</bpmn:incoming>
+      <bpmn:outgoing>Flow_0chtr5s</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_Rework" name="Доработать заключение">
+      <bpmn:incoming>F39</bpmn:incoming>
+      <bpmn:outgoing>F40</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="F01" sourceRef="Start" targetRef="T_Receive" />
+    <bpmn:sequenceFlow id="F02" sourceRef="T_Receive" targetRef="T_Register" />
+    <bpmn:sequenceFlow id="F03" sourceRef="T_Register" targetRef="MG_Sample" />
+    <bpmn:sequenceFlow id="F04" sourceRef="MG_Sample" targetRef="T_QCSample" />
+    <bpmn:sequenceFlow id="F05" sourceRef="T_QCSample" targetRef="G_SampleOK" />
+    <bpmn:sequenceFlow id="F06" name="Да" sourceRef="G_SampleOK" targetRef="T_Extract" />
+    <bpmn:sequenceFlow id="F07" sourceRef="T_Extract" targetRef="MG_DNA" />
+    <bpmn:sequenceFlow id="F08" sourceRef="MG_DNA" targetRef="T_QCDNA" />
+    <bpmn:sequenceFlow id="F09" sourceRef="T_QCDNA" targetRef="G_DNAOK" />
+    <bpmn:sequenceFlow id="F10" name="Да" sourceRef="G_DNAOK" targetRef="T_Library" />
+    <bpmn:sequenceFlow id="F11" sourceRef="T_Library" targetRef="T_QCLib" />
+    <bpmn:sequenceFlow id="F12" sourceRef="T_QCLib" targetRef="G_LibOK" />
+    <bpmn:sequenceFlow id="F13" name="Да" sourceRef="G_LibOK" targetRef="MG_Enq" />
+    <bpmn:sequenceFlow id="F14" sourceRef="MG_Enq" targetRef="T_Enqueue" />
+    <bpmn:sequenceFlow id="F15" sourceRef="T_Enqueue" targetRef="Timer" />
+    <bpmn:sequenceFlow id="F16" sourceRef="Timer" targetRef="T_Seq" />
+    <bpmn:sequenceFlow id="F17" sourceRef="T_Seq" targetRef="T_QCRun" />
+    <bpmn:sequenceFlow id="F18" sourceRef="T_QCRun" targetRef="G_RunOK" />
+    <bpmn:sequenceFlow id="F19" name="Да" sourceRef="G_RunOK" targetRef="T_Bio" />
+    <bpmn:sequenceFlow id="F20" sourceRef="T_Bio" targetRef="T_Interpret" />
+    <bpmn:sequenceFlow id="F21" sourceRef="T_Interpret" targetRef="T_Report" />
+    <bpmn:sequenceFlow id="F22" sourceRef="T_Report" targetRef="MG_Review" />
+    <bpmn:sequenceFlow id="F23" sourceRef="MG_Review" targetRef="T_Review" />
+    <bpmn:sequenceFlow id="F24" sourceRef="T_Review" targetRef="G_Approved" />
+    <bpmn:sequenceFlow id="F25" name="Да" sourceRef="G_Approved" targetRef="T_Release" />
+    <bpmn:sequenceFlow id="F26" sourceRef="T_Release" targetRef="End_OK" />
+    <bpmn:sequenceFlow id="F27" name="Нет" sourceRef="G_SampleOK" targetRef="T_Reject" />
+    <bpmn:sequenceFlow id="F28" sourceRef="T_Reject" targetRef="T_Recollect" />
+    <bpmn:sequenceFlow id="F29" sourceRef="T_Recollect" targetRef="G_Recollected" />
+    <bpmn:sequenceFlow id="F30" name="Да" sourceRef="G_Recollected" targetRef="T_ReceiveAgain" />
+    <bpmn:sequenceFlow id="F31" sourceRef="T_ReceiveAgain" targetRef="MG_Sample" />
+    <bpmn:sequenceFlow id="F32" name="Нет" sourceRef="G_Recollected" targetRef="T_Close" />
+    <bpmn:sequenceFlow id="F33" sourceRef="T_Close" targetRef="End_Closed" />
+    <bpmn:sequenceFlow id="F34" name="Нет" sourceRef="G_DNAOK" targetRef="T_RedoDNA" />
+    <bpmn:sequenceFlow id="F35" sourceRef="T_RedoDNA" targetRef="MG_DNA" />
+    <bpmn:sequenceFlow id="F36" name="Нет" sourceRef="G_LibOK" targetRef="T_RedoLib" />
+    <bpmn:sequenceFlow id="F38" name="Нет" sourceRef="G_RunOK" targetRef="MG_Enq" />
+    <bpmn:sequenceFlow id="F39" name="Нет" sourceRef="G_Approved" targetRef="T_Rework" />
+    <bpmn:sequenceFlow id="F40" sourceRef="T_Rework" targetRef="MG_Review" />
+    <bpmn:sequenceFlow id="Flow_0chtr5s" sourceRef="T_RedoLib" targetRef="T_QCLib" />
+    <bpmn:textAnnotation id="Ann_Batch">
+      <bpmn:text>Плановые партии: пн, ср, пт 09:00. Срочные: каждый рабочий день</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_Ann_Batch" associationDirection="None" sourceRef="Timer" targetRef="Ann_Batch" />
+    <bpmn:textAnnotation id="Ann_Peak">
+      <bpmn:text>Пик нагрузки на врачей: ср-чт. Смены планируются под пик</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_Ann_Peak" associationDirection="None" sourceRef="T_Interpret" targetRef="Ann_Peak" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_ToBe">
+      <bpmndi:BPMNShape id="Participant_Lab_di" bpmnElement="Participant_Lab" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="4000" height="1680" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Sen_di" bpmnElement="Lane_Sen" isHorizontal="true">
+        <dc:Bounds x="190" y="1480" width="3970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Gen_di" bpmnElement="Lane_Gen" isHorizontal="true">
+        <dc:Bounds x="190" y="1200" width="3970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Bio_di" bpmnElement="Lane_Bio" isHorizontal="true">
+        <dc:Bounds x="190" y="920" width="3970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Eq_di" bpmnElement="Lane_Eq" isHorizontal="true">
+        <dc:Bounds x="190" y="640" width="3970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Lab_di" bpmnElement="Lane_Lab" isHorizontal="true">
+        <dc:Bounds x="190" y="360" width="3970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Reg_di" bpmnElement="Lane_Reg" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="3970" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_di" bpmnElement="Start">
+        <dc:Bounds x="252" y="157" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="220" y="197" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Receive_di" bpmnElement="T_Receive">
+        <dc:Bounds x="350" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Register_di" bpmnElement="T_Register">
+        <dc:Bounds x="500" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MG_Sample_di" bpmnElement="MG_Sample" isMarkerVisible="true">
+        <dc:Bounds x="645" y="430" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_QCSample_di" bpmnElement="T_QCSample">
+        <dc:Bounds x="750" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_SampleOK_di" bpmnElement="G_SampleOK" isMarkerVisible="true">
+        <dc:Bounds x="925" y="430" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="895" y="413" width="110" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Extract_di" bpmnElement="T_Extract">
+        <dc:Bounds x="1110" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MG_DNA_di" bpmnElement="MG_DNA" isMarkerVisible="true">
+        <dc:Bounds x="1265" y="430" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_QCDNA_di" bpmnElement="T_QCDNA">
+        <dc:Bounds x="1370" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_DNAOK_di" bpmnElement="G_DNAOK" isMarkerVisible="true">
+        <dc:Bounds x="1545" y="430" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1515" y="372" width="110" height="54" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Library_di" bpmnElement="T_Library">
+        <dc:Bounds x="1670" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_QCLib_di" bpmnElement="T_QCLib" bioc:stroke="#2e7d32" bioc:fill="#e8f5e9" color:background-color="#e8f5e9" color:border-color="#2e7d32">
+        <dc:Bounds x="1820" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_LibOK_di" bpmnElement="G_LibOK" isMarkerVisible="true" bioc:stroke="#2e7d32" bioc:fill="#e8f5e9" color:background-color="#e8f5e9" color:border-color="#2e7d32">
+        <dc:Bounds x="1995" y="430" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1965" y="396" width="110" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MG_Enq_di" bpmnElement="MG_Enq" isMarkerVisible="true">
+        <dc:Bounds x="2115" y="430" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Enqueue_di" bpmnElement="T_Enqueue">
+        <dc:Bounds x="2220" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Timer_di" bpmnElement="Timer" bioc:stroke="#2e7d32" bioc:fill="#e8f5e9" color:background-color="#e8f5e9" color:border-color="#2e7d32">
+        <dc:Bounds x="2402" y="717" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2360" y="686" width="120" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Seq_di" bpmnElement="T_Seq">
+        <dc:Bounds x="2520" y="695" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_QCRun_di" bpmnElement="T_QCRun">
+        <dc:Bounds x="2670" y="975" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_RunOK_di" bpmnElement="G_RunOK" isMarkerVisible="true">
+        <dc:Bounds x="2845" y="990" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2815" y="973" width="110" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Bio_di" bpmnElement="T_Bio">
+        <dc:Bounds x="2970" y="975" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Interpret_di" bpmnElement="T_Interpret">
+        <dc:Bounds x="3120" y="1255" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Report_di" bpmnElement="T_Report">
+        <dc:Bounds x="3270" y="1255" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="MG_Review_di" bpmnElement="MG_Review" isMarkerVisible="true">
+        <dc:Bounds x="3425" y="1550" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Review_di" bpmnElement="T_Review">
+        <dc:Bounds x="3530" y="1535" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Approved_di" bpmnElement="G_Approved" isMarkerVisible="true">
+        <dc:Bounds x="3705" y="1550" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3675" y="1604" width="110" height="54" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Release_di" bpmnElement="T_Release">
+        <dc:Bounds x="3820" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_OK_di" bpmnElement="End_OK" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="3982" y="157" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3957" y="197" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Reject_di" bpmnElement="T_Reject" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="900" y="535" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Recollect_di" bpmnElement="T_Recollect" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="1000" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Recollected_di" bpmnElement="G_Recollected" isMarkerVisible="true">
+        <dc:Bounds x="905" y="150" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="875" y="100" width="110" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ReceiveAgain_di" bpmnElement="T_ReceiveAgain" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="750" y="135" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Close_di" bpmnElement="T_Close" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="880" y="255" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Closed_di" bpmnElement="End_Closed" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="1142" y="277" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1122" y="317" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RedoDNA_di" bpmnElement="T_RedoDNA" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="1520" y="535" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RedoLib_di" bpmnElement="T_RedoLib" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="1970" y="535" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Rework_di" bpmnElement="T_Rework" bioc:stroke="#e65100" bioc:fill="#fff3e0" color:background-color="#fff3e0" color:border-color="#e65100">
+        <dc:Bounds x="3680" y="1375" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_Batch_di" bpmnElement="Ann_Batch" bioc:stroke="#2e7d32" bioc:fill="#e8f5e9" color:background-color="#e8f5e9" color:border-color="#2e7d32">
+        <dc:Bounds x="2305" y="827" width="230" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ann_Peak_di" bpmnElement="Ann_Peak" bioc:stroke="#2e7d32" bioc:fill="#e8f5e9" color:background-color="#e8f5e9" color:border-color="#2e7d32">
+        <dc:Bounds x="3065" y="1387" width="210" height="56" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F01_di" bpmnElement="F01">
+        <di:waypoint x="288" y="175" />
+        <di:waypoint x="350" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F02_di" bpmnElement="F02">
+        <di:waypoint x="450" y="175" />
+        <di:waypoint x="500" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F03_di" bpmnElement="F03">
+        <di:waypoint x="600" y="175" />
+        <di:waypoint x="622.5" y="175" />
+        <di:waypoint x="622.5" y="455" />
+        <di:waypoint x="645" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F04_di" bpmnElement="F04">
+        <di:waypoint x="695" y="455" />
+        <di:waypoint x="750" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F05_di" bpmnElement="F05">
+        <di:waypoint x="850" y="455" />
+        <di:waypoint x="925" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F06_di" bpmnElement="F06">
+        <di:waypoint x="975" y="455" />
+        <di:waypoint x="1110" y="455" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="981" y="437" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07_di" bpmnElement="F07">
+        <di:waypoint x="1210" y="455" />
+        <di:waypoint x="1265" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F08_di" bpmnElement="F08">
+        <di:waypoint x="1315" y="455" />
+        <di:waypoint x="1370" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F09_di" bpmnElement="F09">
+        <di:waypoint x="1470" y="455" />
+        <di:waypoint x="1545" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10">
+        <di:waypoint x="1595" y="455" />
+        <di:waypoint x="1670" y="455" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1601" y="437" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11">
+        <di:waypoint x="1770" y="455" />
+        <di:waypoint x="1820" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12">
+        <di:waypoint x="1920" y="455" />
+        <di:waypoint x="1995" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13">
+        <di:waypoint x="2045" y="455" />
+        <di:waypoint x="2115" y="455" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2051" y="437" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14">
+        <di:waypoint x="2165" y="455" />
+        <di:waypoint x="2220" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15">
+        <di:waypoint x="2320" y="455" />
+        <di:waypoint x="2361" y="455" />
+        <di:waypoint x="2361" y="735" />
+        <di:waypoint x="2402" y="735" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16">
+        <di:waypoint x="2438" y="735" />
+        <di:waypoint x="2520" y="735" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17">
+        <di:waypoint x="2620" y="735" />
+        <di:waypoint x="2645" y="735" />
+        <di:waypoint x="2645" y="1015" />
+        <di:waypoint x="2670" y="1015" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18_di" bpmnElement="F18">
+        <di:waypoint x="2770" y="1015" />
+        <di:waypoint x="2845" y="1015" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_di" bpmnElement="F19">
+        <di:waypoint x="2895" y="1015" />
+        <di:waypoint x="2970" y="1015" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2901" y="997" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_di" bpmnElement="F20">
+        <di:waypoint x="3070" y="1015" />
+        <di:waypoint x="3095" y="1015" />
+        <di:waypoint x="3095" y="1295" />
+        <di:waypoint x="3120" y="1295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_di" bpmnElement="F21">
+        <di:waypoint x="3220" y="1295" />
+        <di:waypoint x="3270" y="1295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22_di" bpmnElement="F22">
+        <di:waypoint x="3370" y="1295" />
+        <di:waypoint x="3397.5" y="1295" />
+        <di:waypoint x="3397.5" y="1575" />
+        <di:waypoint x="3425" y="1575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F23_di" bpmnElement="F23">
+        <di:waypoint x="3475" y="1575" />
+        <di:waypoint x="3530" y="1575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F24_di" bpmnElement="F24">
+        <di:waypoint x="3630" y="1575" />
+        <di:waypoint x="3705" y="1575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F25_di" bpmnElement="F25">
+        <di:waypoint x="3755" y="1575" />
+        <di:waypoint x="3870" y="1575" />
+        <di:waypoint x="3870" y="215" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3761" y="1557" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F26_di" bpmnElement="F26">
+        <di:waypoint x="3920" y="175" />
+        <di:waypoint x="3982" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F27_di" bpmnElement="F27">
+        <di:waypoint x="950" y="480" />
+        <di:waypoint x="950" y="535" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="956" y="484" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F28_di" bpmnElement="F28">
+        <di:waypoint x="1000" y="575" />
+        <di:waypoint x="1050" y="575" />
+        <di:waypoint x="1050" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F29_di" bpmnElement="F29">
+        <di:waypoint x="1000" y="175" />
+        <di:waypoint x="955" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F30_di" bpmnElement="F30">
+        <di:waypoint x="905" y="175" />
+        <di:waypoint x="850" y="175" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="875" y="157" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F31_di" bpmnElement="F31">
+        <di:waypoint x="800" y="215" />
+        <di:waypoint x="800" y="400" />
+        <di:waypoint x="670" y="400" />
+        <di:waypoint x="670" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F32_di" bpmnElement="F32">
+        <di:waypoint x="930" y="200" />
+        <di:waypoint x="930" y="255" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="936" y="204" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F33_di" bpmnElement="F33">
+        <di:waypoint x="980" y="295" />
+        <di:waypoint x="1142" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F34_di" bpmnElement="F34">
+        <di:waypoint x="1570" y="480" />
+        <di:waypoint x="1570" y="535" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1576" y="484" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F35_di" bpmnElement="F35">
+        <di:waypoint x="1520" y="575" />
+        <di:waypoint x="1290" y="575" />
+        <di:waypoint x="1290" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F36_di" bpmnElement="F36">
+        <di:waypoint x="2020" y="480" />
+        <di:waypoint x="2020" y="535" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2026" y="484" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F38_di" bpmnElement="F38">
+        <di:waypoint x="2870" y="1040" />
+        <di:waypoint x="2870" y="1135" />
+        <di:waypoint x="2140" y="1135" />
+        <di:waypoint x="2140" y="480" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2876" y="1044" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F39_di" bpmnElement="F39">
+        <di:waypoint x="3730" y="1550" />
+        <di:waypoint x="3730" y="1455" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3736" y="1532" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F40_di" bpmnElement="F40">
+        <di:waypoint x="3680" y="1415" />
+        <di:waypoint x="3450" y="1415" />
+        <di:waypoint x="3450" y="1550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_Batch_di" bpmnElement="Assoc_Ann_Batch">
+        <di:waypoint x="2420" y="753" />
+        <di:waypoint x="2420" y="827" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Assoc_Ann_Peak_di" bpmnElement="Assoc_Ann_Peak">
+        <di:waypoint x="3170" y="1335" />
+        <di:waypoint x="3170" y="1387" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0chtr5s_di" bpmnElement="Flow_0chtr5s">
+        <di:waypoint x="1970" y="575" />
+        <di:waypoint x="1870" y="575" />
+        <di:waypoint x="1870" y="495" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
