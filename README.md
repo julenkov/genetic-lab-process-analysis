@@ -25,9 +25,9 @@
 
 | Этап | Результат | Файлы |
 | --- | --- | --- |
-| 1. Данные | Синтетический журнал событий (1500 случаев, 21 698 событий) | `data/`, `scripts/generate_event_log.py` |
+| 1. Данные | Синтетический журнал событий (1500 случаев, 21 698 событий) | [data/](data/), [scripts/generate_event_log.py](scripts/generate_event_log.py) |
 | 2. Схема AS-IS | BPMN, 6 дорожек | `diagrams/as_is.bpmn` |
-| 3. Анализ в SQL | Сроки, ожидание по этапам, повторы, очереди | `sql/analysis.sql`, `analysis/lab.db` |
+| 3. Анализ в SQL | Сроки, ожидание по этапам, повторы, очереди | [sql/analysis.sql](sql/analysis.sql), [analysis/lab.db](analysis/lab.db) |
 | 4. Выводы | Три проблемы с цифрами | [analysis/findings.md](analysis/findings.md) |
 | 5. Предложения | Таблица «проблема, причина, предложение, эффект, риски» | [docs/improvements.md](docs/improvements.md) |
 | 6. Оценка эффекта | 8 сценариев на одном потоке образцов | [analysis/scenario_results.md](analysis/scenario_results.md), [sql/scenarios.sql](sql/scenarios.sql), [analysis/scenarios.db](analysis/scenarios.db) |
